@@ -1,5 +1,5 @@
 import socket from '@/api/socket';
-import { User } from '../types';
+import { User } from '@/types';
 
 export const fetchUsers = async (): Promise<User[]> => {
   return new Promise(resolve => {

@@ -18,7 +18,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const user: User = { id: client.id, name: `User${this.users.length + 1}` };
     this.users.push(user);
     this.server.emit('userUpdate', this.users);
-    client.emit('message', { id: Date.now(), user: 'System', text: 'Welcome to the chat!' });
+    const welcomeMessage: Message = { id: Date.now(), user: 'System', text: 'Welcome to the chat!' };
+    client.emit('message', welcomeMessage);
   }
 
   handleDisconnect(client: Socket) {

@@ -1,22 +1,38 @@
-import React, { useState } from 'react';
-import { useMutation } from '@tanstack/react-query';
 import { sendMessage } from '@/api/messages';
-import { useUserStore } from '@/store/userStore';
-import { Message } from '@/types';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import React, { useState, useEffect } from 'react';
+import { SendMessageInput } from '@/types';
+import { v4 as uuidv4 } from 'uuid';
 
 const ChatInput: React.FC = () => {
   const [message, setMessage] = useState('');
-  const user = useUserStore(state => state.user);
+  const [username, setUsername] = useState('');
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    const userId = uuidv4();
+    setUsername(`User-${userId.slice(0, 8)}`);
+  }, []);
 
   const mutation = useMutation({
-    mutationFn: (newMessage: Omit<Message, 'id'>) => sendMessage(newMessage),
+    mutationFn: sendMessage,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['messages'] });
+      setMessage('');
+    },
+    onError: error => {
+      console.error('Failed to send message:', error);
+    },
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (message.trim() && user) {
-      mutation.mutate({ text: message, user: user.name });
-      setMessage('');
+    if (message.trim()) {
+      const newMessage: SendMessageInput = {
+        text: message,
+        user: username,
+      };
+      mutation.mutate(newMessage);
     }
   };
 

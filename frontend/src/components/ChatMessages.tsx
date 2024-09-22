@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { fetchMessages, subscribeToMessages } from '../api/messages';
-import { Message } from '../types';
+import { fetchMessages, subscribeToMessages } from '@/api/messages';
+import { Message } from '@/types';
 
 const ChatMessages: React.FC = () => {
   const queryClient = useQueryClient();

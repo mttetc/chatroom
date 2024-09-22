@@ -5,6 +5,8 @@ export interface Message {
 }
 
 export interface User {
-  id: number;
+  id: string;
   name: string;
 }
+
+export type SendMessageInput = Omit<Message, 'id'>;

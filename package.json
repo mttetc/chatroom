@@ -1,0 +1,19 @@
+{
+  "name": "chat-app",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "concurrently \"npm run start:frontend\" \"npm run start:backend\"",
+    "start:frontend": "cd frontend && npm run dev",
+    "start:backend": "cd backend && npm run start:dev",
+    "copy-shared": "cp -R ./shared ./frontend/src && cp -R ./shared ./backend/src",
+    "prestart": "npm run copy-shared"
+  },
+  "devDependencies": {
+    "@types/uuid": "^10.0.0",
+    "concurrently": "^6.5.1"
+  },
+  "dependencies": {
+    "uuid": "^10.0.0",
+    "zod": "^3.23.8"
+  }
+}
