@@ -1,18 +1,16 @@
 import { sendMessage } from '@/api/messages';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import React, { useState, useEffect } from 'react';
+import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
+import React, { useState } from 'react';
 import { SendMessageInput } from '@/types';
-import { v4 as uuidv4 } from 'uuid';
+import { fetchCurrentUser } from '@/api/users';
 
 const ChatInput: React.FC = () => {
   const [message, setMessage] = useState('');
-  const [username, setUsername] = useState('');
   const queryClient = useQueryClient();
-
-  useEffect(() => {
-    const userId = uuidv4();
-    setUsername(`User-${userId.slice(0, 8)}`);
-  }, []);
+  const { data: user } = useQuery({
+    queryKey: ['currentUser'],
+    queryFn: fetchCurrentUser,
+  });
 
   const mutation = useMutation({
     mutationFn: sendMessage,
@@ -27,10 +25,10 @@ const ChatInput: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (message.trim()) {
+    if (message.trim() && user) {
       const newMessage: SendMessageInput = {
         text: message,
-        user: username,
+        user: user,
       };
       mutation.mutate(newMessage);
     }

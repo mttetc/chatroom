@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { fetchMessages, subscribeToMessages } from '@/api/messages';
 import { Message } from '@/types';
+import { getUserColor } from '@/utils/colorUtils';
 
 const ChatMessages: React.FC = () => {
   const queryClient = useQueryClient();
@@ -30,8 +31,16 @@ const ChatMessages: React.FC = () => {
     <div className="flex-1 overflow-y-auto mb-4">
       {messages?.map(message => (
         <div key={message.id} className="mb-2">
-          <span className="font-bold">{message.user}: </span>
-          <span>{message.text}</span>
+          {message.user ? (
+            <>
+              <span className={`font-bold ${getUserColor(message.user.id)}`}>
+                {message.user.name}:{' '}
+              </span>
+              <span>{message.text}</span>
+            </>
+          ) : (
+            <span className="italic text-gray-500">{message.text}</span>
+          )}
         </div>
       ))}
     </div>

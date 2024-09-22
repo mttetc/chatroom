@@ -5,10 +5,14 @@ import { User } from '../types';
 
 const UserList: React.FC = () => {
   const queryClient = useQueryClient();
-  const { data: users, isLoading, error } = useQuery<User[]>({queryKey: ['users'], queryFn: fetchUsers});
+  const {
+    data: users,
+    isLoading,
+    error,
+  } = useQuery<User[]>({ queryKey: ['users'], queryFn: fetchUsers });
 
   useEffect(() => {
-    const unsubscribe = subscribeToUserUpdates((updatedUsers) => {
+    const unsubscribe = subscribeToUserUpdates(updatedUsers => {
       queryClient.setQueryData(['users'], updatedUsers);
     });
 
@@ -22,9 +26,11 @@ const UserList: React.FC = () => {
 
   return (
     <div className="w-64 bg-white p-4 border-l border-gray-200">
-      <h2 className="text-lg font-semibold mb-4">Online Users</h2>
+      <h2 className="text-lg font-semibold mb-4">
+        Online Users ({users?.length || 0})
+      </h2>
       <ul>
-        {users?.map((user) => (
+        {users?.map(user => (
           <li key={user.id} className="mb-2 flex items-center">
             <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
             {user.name}
