@@ -1,15 +1,13 @@
 import { Message, SendMessageInput } from '@/types';
 import socket from '@/api/socket';
 
-export const fetchMessages = async (): Promise<Message[]> => {
-  return new Promise((resolve, reject) => {
-    socket.emit('getMessages', (messages: Message[]) => {
-      resolve(messages);
-    });
-  });
+export const fetchMessages = (
+  callback: (messages: Message[]) => void
+): void => {
+  socket.emit('getMessages', callback);
 };
 
-export const sendMessage = async (message: SendMessageInput): Promise<void> => {
+export const sendMessage = (message: SendMessageInput): void => {
   socket.emit('message', message);
 };
 

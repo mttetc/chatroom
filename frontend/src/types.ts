@@ -7,6 +7,7 @@ export interface Message {
 export interface User {
   id: string;
   name: string;
+  isAnonymous?: boolean;
 }
 
-export type SendMessageInput = Omit<Message, 'id'>;
+export type SendMessageInput = Omit<Message, 'id' | 'user'>;

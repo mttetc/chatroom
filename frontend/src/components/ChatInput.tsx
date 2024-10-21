@@ -1,36 +1,18 @@
-import { sendMessage } from '@/api/messages';
-import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import React, { useState } from 'react';
+import socket from '@/api/socket';
 import { SendMessageInput } from '@/types';
-import { fetchCurrentUser } from '@/api/users';
 
 const ChatInput: React.FC = () => {
   const [message, setMessage] = useState('');
-  const queryClient = useQueryClient();
-  const { data: user } = useQuery({
-    queryKey: ['currentUser'],
-    queryFn: fetchCurrentUser,
-  });
-
-  const mutation = useMutation({
-    mutationFn: sendMessage,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['messages'] });
-      setMessage('');
-    },
-    onError: error => {
-      console.error('Failed to send message:', error);
-    },
-  });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (message.trim() && user) {
+    if (message.trim()) {
       const newMessage: SendMessageInput = {
         text: message,
-        user: user,
       };
-      mutation.mutate(newMessage);
+      socket.emit('message', newMessage);
+      setMessage('');
     }
   };
 

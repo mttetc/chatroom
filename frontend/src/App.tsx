@@ -1,19 +1,25 @@
 import { useEffect } from 'react';
-import { connectSocket } from './api/socket';
+import socket from './api/socket';
 import ChatRoom from './components/ChatRoom';
 import Layout from './components/Layout';
-import SocketManager from './components/SocketManager';
+import { useAuthStore } from './stores/authStore';
+import AuthScreen from './components/AuthScreen';
 
 function App() {
+  const isAuthenticated = useAuthStore(state => state.isAuthenticated);
+
   useEffect(() => {
-    connectSocket();
+    if (!socket.connected) {
+      socket.connect();
+    }
   }, []);
 
-  return (
+  return isAuthenticated ? (
     <Layout>
-      <SocketManager />
       <ChatRoom />
     </Layout>
+  ) : (
+    <AuthScreen />
   );
 }
 

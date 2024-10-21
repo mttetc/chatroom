@@ -1,35 +1,41 @@
-import React, { useEffect } from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { fetchMessages, subscribeToMessages } from '@/api/messages';
+import React, { useState, useEffect } from 'react';
 import { Message } from '@/types';
 import { getUserColor } from '@/utils/colorUtils';
+import { fetchMessages, subscribeToMessages } from '@/api/messages';
 
 const ChatMessages: React.FC = () => {
-  const queryClient = useQueryClient();
-  const {
-    data: messages,
-    isLoading,
-    error,
-  } = useQuery<Message[]>({ queryKey: ['messages'], queryFn: fetchMessages });
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    const loadMessages = () => {
+      console.log('Fetching messages');
+      fetchMessages(initialMessages => {
+        console.log('Received initial messages:', initialMessages);
+        setMessages(initialMessages);
+        setIsLoading(false);
+      });
+    };
+
+    loadMessages();
+
     const unsubscribe = subscribeToMessages(newMessage => {
-      queryClient.setQueryData<Message[]>(['messages'], oldMessages =>
-        oldMessages ? [...oldMessages, newMessage] : [newMessage]
-      );
+      console.log('Received new message:', newMessage);
+      setMessages(prevMessages => [...prevMessages, newMessage]);
     });
 
     return () => {
       unsubscribe();
     };
-  }, [queryClient]);
+  }, []);
 
   if (isLoading) return <div>Loading messages...</div>;
-  if (error) return <div>Error loading messages</div>;
+  if (error) return <div>{error}</div>;
 
   return (
     <div className="flex-1 overflow-y-auto mb-4">
-      {messages?.map(message => (
+      {messages.map(message => (
         <div key={message.id} className="mb-2">
           {message.user ? (
             <>
