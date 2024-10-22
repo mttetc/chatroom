@@ -1,6 +1,5 @@
+import { socket } from '@/api/socket';
 import React, { useState } from 'react';
-import socket from '@/api/socket';
-import { SendMessageInput } from '@/types';
 
 const ChatInput: React.FC = () => {
   const [message, setMessage] = useState('');
@@ -8,10 +7,7 @@ const ChatInput: React.FC = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (message.trim()) {
-      const newMessage: SendMessageInput = {
-        text: message,
-      };
-      socket.emit('message', newMessage);
+      socket.emit('message', message);
       setMessage('');
     }
   };

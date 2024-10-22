@@ -11,11 +11,9 @@ export interface RegisterDto {
 export interface JwtPayload {
   id: string;
   name: string;
-  isAnonymous: boolean;
 }
 
 export interface AuthenticatedUser {
   id: string;
   name: string;
-  isAnonymous: boolean;
 }

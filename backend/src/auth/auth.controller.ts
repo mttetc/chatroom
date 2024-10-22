@@ -17,14 +17,14 @@ export class AuthController {
     return this.authService.login(loginDto);
   }
 
-  @Post('anonymous')
-  async loginAnonymous() {
-    return this.authService.login({} as LoginDto, true);
-  }
-
   @UseGuards(JwtAuthGuard)
   @Post('test')
   async testAuth() {
     return { message: 'You are authenticated!' };
+  }
+
+  @Post('anonymous')
+  async loginAnonymous(@Body('id') id?: string) {
+    return this.authService.loginAnonymous(id);
   }
 }

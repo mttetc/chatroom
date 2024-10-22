@@ -6,7 +6,6 @@ export interface User {
   id: string;
   name: string;
   password?: string;
-  isAnonymous: boolean;
 }
 
 @Injectable()
@@ -32,18 +31,20 @@ export class UsersService {
       id,
       name,
       password: hashedPassword,
-      isAnonymous: false,
     };
     this.users.set(id, newUser);
     const { password: _, ...result } = newUser;
     return result;
   }
 
-  createAnonymous(): Omit<User, 'password'> {
-    const id = uuidv4();
-    const anonymousName = `Anonymous-${id.slice(0, 8)}`;
-    const anonymousUser: User = { id, name: anonymousName, isAnonymous: true };
-    this.anonymousUsers.set(id, anonymousUser);
+  createAnonymous(id?: string): Omit<User, 'password'> {
+    if (id && this.anonymousUsers.has(id)) {
+      return this.anonymousUsers.get(id)!;
+    }
+    const newId = id || uuidv4();
+    const anonymousName = `Anonymous-${newId.slice(0, 8)}`;
+    const anonymousUser: User = { id: newId, name: anonymousName };
+    this.anonymousUsers.set(newId, anonymousUser);
     return anonymousUser;
   }
 
@@ -55,7 +56,16 @@ export class UsersService {
     return [...regularUsers, ...anonymousUsers];
   }
 
-  removeAnonymousUser(id: string): void {
+  removeUser(id: string): void {
+    this.users.delete(id);
     this.anonymousUsers.delete(id);
+  }
+
+  clearInactiveAnonymousUsers(activeIds: string[]): void {
+    for (const [id, user] of this.anonymousUsers.entries()) {
+      if (!activeIds.includes(id)) {
+        this.anonymousUsers.delete(id);
+      }
+    }
   }
 }

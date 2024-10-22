@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
 import { fetchUsers, subscribeToUserUpdates } from '@/api/users';
 import { User } from '@/types';
+import React, { useEffect, useState } from 'react';
 
 const UserList: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
@@ -10,10 +10,13 @@ const UserList: React.FC = () => {
   useEffect(() => {
     const loadUsers = async () => {
       try {
+        console.log('Fetching users...');
         const initialUsers = await fetchUsers();
+        console.log('Fetched users:', initialUsers);
         setUsers(initialUsers);
         setIsLoading(false);
       } catch (err) {
+        console.error('Error fetching users:', err);
         setError('Failed to load users');
         setIsLoading(false);
       }
@@ -22,10 +25,12 @@ const UserList: React.FC = () => {
     loadUsers();
 
     const unsubscribe = subscribeToUserUpdates(updatedUsers => {
+      console.log('Received updated users:', updatedUsers);
       setUsers(updatedUsers);
     });
 
     return () => {
+      console.log('Cleaning up UserList component');
       unsubscribe();
     };
   }, []);

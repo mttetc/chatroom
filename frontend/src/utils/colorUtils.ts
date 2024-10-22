@@ -19,9 +19,20 @@ export const getUserColor = (userId: string | undefined): string => {
   if (!userId) {
     return colors[0];
   }
-  // Use the user's ID to consistently get the same color for each user
-  const index =
-    userId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) %
-    colors.length;
+
+  let hash = 0;
+  for (let i = 0; i < userId.length; i++) {
+    const char = userId.charCodeAt(i);
+    hash = (hash << 5) - hash + char;
+    hash = hash & hash;
+  }
+
+  // Ensure positive index
+  const positiveHash = Math.abs(hash);
+
+  // Use modulo to get index within array bounds
+  const index = positiveHash % colors.length;
+
+  console.log('User ID:', userId, 'Color Index:', index);
   return colors[index];
 };

@@ -32,16 +32,17 @@ const AuthScreen: React.FC = () => {
   });
 
   const loginMutation = useMutation({
-    mutationFn: loginUser,
+    mutationFn: (data: AuthFormInputs) => loginUser(data.name, data.password),
     onSuccess: data => setAuth(data.user, data.access_token),
   });
 
   const registerMutation = useMutation({
-    mutationFn: registerUser,
+    mutationFn: (data: AuthFormInputs) =>
+      registerUser(data.name, data.password),
     onSuccess: data => setAuth(data.user, data.access_token),
   });
 
-  const anonymousLoginMutation = useMutation({
+  const anonymousMutation = useMutation({
     mutationFn: loginAnonymous,
     onSuccess: data => setAuth(data.user, data.access_token),
   });
@@ -52,10 +53,6 @@ const AuthScreen: React.FC = () => {
 
   const onRegister = (data: AuthFormInputs) => {
     registerMutation.mutate(data);
-  };
-
-  const handleAnonymousLogin = () => {
-    anonymousLoginMutation.mutate();
   };
 
   return (
@@ -102,7 +99,9 @@ const AuthScreen: React.FC = () => {
         </form>
       </div>
       <div>
-        <button onClick={handleAnonymousLogin}>Join as Anonymous</button>
+        <button onClick={() => anonymousMutation.mutate()}>
+          Join as Anonymous
+        </button>
       </div>
     </div>
   );

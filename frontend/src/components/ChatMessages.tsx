@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import { fetchMessages, subscribeToMessages } from '@/api/messages';
 import { Message } from '@/types';
 import { getUserColor } from '@/utils/colorUtils';
-import { fetchMessages, subscribeToMessages } from '@/api/messages';
+import React, { useEffect, useState } from 'react';
 
 const ChatMessages: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -9,23 +9,28 @@ const ChatMessages: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const loadMessages = () => {
-      console.log('Fetching messages');
-      fetchMessages(initialMessages => {
-        console.log('Received initial messages:', initialMessages);
+    const loadMessages = async () => {
+      try {
+        console.log('Fetching messages...');
+        const initialMessages = await fetchMessages();
+        console.log('Fetched messages:', initialMessages);
         setMessages(initialMessages);
         setIsLoading(false);
-      });
+      } catch (err) {
+        console.error('Error fetching messages:', err);
+        setError('Failed to load messages');
+        setIsLoading(false);
+      }
     };
 
     loadMessages();
 
-    const unsubscribe = subscribeToMessages(newMessage => {
-      console.log('Received new message:', newMessage);
-      setMessages(prevMessages => [...prevMessages, newMessage]);
+    const unsubscribe = subscribeToMessages(messages => {
+      setMessages(messages);
     });
 
     return () => {
+      console.log('Unsubscribing from messages');
       unsubscribe();
     };
   }, []);

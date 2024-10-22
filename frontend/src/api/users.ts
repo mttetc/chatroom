@@ -1,4 +1,4 @@
-import socket from '@/api/socket';
+import { socket } from './socket';
 import { User } from '@/types';
 
 export const fetchCurrentUser = async (): Promise<User> => {
@@ -9,10 +9,14 @@ export const fetchCurrentUser = async (): Promise<User> => {
   });
 };
 
-export const fetchUsers = async (): Promise<User[]> => {
-  return new Promise(resolve => {
+export const fetchUsers = (): Promise<User[]> => {
+  return new Promise((resolve, reject) => {
     socket.emit('getUsers', (users: User[]) => {
-      resolve(users);
+      if (users) {
+        resolve(users);
+      } else {
+        reject(new Error('Failed to fetch users'));
+      }
     });
   });
 };

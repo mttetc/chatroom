@@ -1,8 +1,13 @@
-import socket from '@/api/socket';
-import { User } from '@/types';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
+// Define the User type
+export interface User {
+  id: string;
+  name: string;
+}
+
+// Define the AuthState interface
 interface AuthState {
   user: User | null;
   token: string | null;
@@ -11,32 +16,20 @@ interface AuthState {
   logout: () => void;
 }
 
+// Create the auth store
 export const useAuthStore = create<AuthState>()(
   persist(
     set => ({
       user: null,
       token: null,
       isAuthenticated: false,
-      setAuth: (user, token) => {
-        socket.auth = { token };
-        socket.connect();
-        set({ user, token, isAuthenticated: true });
-      },
-      logout: () => {
-        socket.disconnect();
-        set({ user: null, token: null, isAuthenticated: false });
-      },
+      setAuth: (user: User, token: string) =>
+        set({ user, token, isAuthenticated: true }),
+      logout: () => set({ user: null, token: null, isAuthenticated: false }),
     }),
     {
       name: 'auth-storage',
       storage: createJSONStorage(() => localStorage),
-      partialize: state => ({
-        user: state.user?.isAnonymous ? null : state.user,
-        token: state.user?.isAnonymous ? null : state.token,
-        isAuthenticated: state.user?.isAnonymous
-          ? false
-          : state.isAuthenticated,
-      }),
     }
   )
 );
